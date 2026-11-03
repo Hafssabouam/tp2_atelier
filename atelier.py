@@ -44,7 +44,29 @@ def ateliers(machines: dict[str, dict]) -> set[str]:
 # --- Étape 3 : valider une ligne (exceptions, tuples) -------------------------------------------
 def lire_nombre(texte: str, champ: str, numero: int) -> float:
     """Convertit "52,3" en 52.3 ; lève ReleveInvalide si la valeur est vide ou non numérique."""
-    raise NotImplementedError("à compléter")
+    texte = texte.strip()
+
+    if not texte :
+        raise ReleveInvalide("valeur manquante", numero, champ)
+    
+    texte = texte.replace(",",".")
+
+    try:
+        nomber = float(texte)
+    except ValueError:
+        raise ReleveInvalide(
+            f"valeur non numérique : {texte!r}", numero, champ
+        ) from None
+    if not math.isfinite(nomber):
+        raise ReleveInvalide(
+            f"valeur non finie : {texte!r}", numero, champ
+        )
+    return nomber 
+
+
+
+
+
 
 
 def parser_releve(brut: dict[str, str], numero: int, machines: dict[str, dict]) -> Releve:
@@ -52,7 +74,33 @@ def parser_releve(brut: dict[str, str], numero: int, machines: dict[str, dict]) 
 
     Lève ReleveInvalide (avec le numéro de ligne et le champ fautif) au premier problème.
     """
-    raise NotImplementedError("à compléter")
+    machine = brut["machine"].strip().upper()
+    if machine not in machines :
+        raise ReleveInvalide(
+        f"machine inconnue : {machine!r}",
+        numero,
+        "machine"
+    )
+    
+    horod= brut["horodatage"].strip()
+    try:
+        horodatage = datetime.fromisoformat(horod)
+    except ValueError: 
+        raise ReleveInvalide(
+            f"horodatage invalide : {horod!r}",
+            numero,
+            "horodatage"
+        ) from None
+    temperature = lire_nombre(brut["temperature"], "temperature", numero)
+    vibration = lire_nombre(brut["vibration"], "vibration", numero)
+    if vibration < 0:
+        raise ReleveInvalide(
+            f"vibration négative : {vibration}",
+            numero,
+            "vibration"
+        )
+
+    return (machine, horodatage, temperature, vibration)
 
 
 # --- Étape 4 : lire le fichier (CSV, générateur, collecte des erreurs) ---------------------------
