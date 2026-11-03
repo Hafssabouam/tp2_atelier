@@ -1,0 +1,7 @@
+[
+  {"id": "M-01", "nom": "Tour CN", "atelier": "Usinage", "temp_max": 70, "vib_max": 4.5},
+  {"id": "M-02", "nom": "Fraiseuse 5 axes", "atelier": "Usinage", "temp_max": 75, "vib_max": 5.0},
+  {"id": "M-03", "nom": "Presse hydraulique", "atelier": "Emboutissage", "temp_max": 65, "vib_max": 6.0},
+  {"id": "M-04", "nom": "Compresseur d'air", "atelier": "Utilités", "temp_max": 90, "vib_max": 3.5},
+  {"id": "M-05", "nom": "Robot de soudage", "atelier": "Assemblage", "temp_max": 60, "vib_max": 2.5}
+]

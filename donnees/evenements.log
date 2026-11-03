@@ -1,0 +1,10 @@
+2026-10-12 07:58:10 [M-01] DEMARRAGE code=D00
+2026-10-12 08:15:02 [M-03] ARRET code=E42 duree=12
+2026-10-12 09:02:40 [M-02] ALARME code=T01
+2026-10-12 09:40:00 [M-02] ARRET code=T01 duree=25
+-- coupure réseau, journal incomplet --
+2026-10-12 10:05:13 [M-03] ARRET code=E42 duree=8
+2026-10-12 10:31:55 [M-1] ARRET code=E10 duree=5
+2026-10-12 11:12:09 [M-01] ARRET code=V03 duree=40
+2026-10-12 11:30:00 [M-04] ALARME code=T02
+2026-10-12 12:00:00 [M-04] ARRET code=T02
