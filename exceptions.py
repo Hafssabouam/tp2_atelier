@@ -13,4 +13,8 @@ class ReleveInvalide(AtelierError):
     """Une ligne de relevé est invalide ; on garde le numéro de ligne et le champ fautif."""
 
     def __init__(self, message: str, ligne: int, champ: str):
-        raise NotImplementedError("à compléter")
+        self.message = message
+        self.ligne = ligne
+        self.champ = champ
+        texte = f"ligne {ligne}, champ '{champ}' : {message}"
+        super().__init__(texte)
