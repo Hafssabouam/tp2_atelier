@@ -110,17 +110,48 @@ def lignes_csv(chemin: Path):
     Le numéro est celui de la ligne dans le fichier (l'en-tête est la ligne 1).
     Lève FichierInvalide si une colonne attendue manque.
     """
-    raise NotImplementedError("à compléter")
+    with open(chemin, "r", encoding="utf-8-sig", newline="") as fichier:
+            lecteur = csv.DictReader(fichier, delimiter=";")
+
+            manquantes = [
+               colonne for colonne in COLONNES
+               if colonne not in lecteur.fieldnames
+            ]
+
+            if manquantes:
+                raise FichierInvalide(
+                f"colonnes manquantes : {', '.join(manquantes)}"
+             )
+
+            for numero, brut in enumerate(lecteur, start=2):
+                yield numero, brut
 
 
 def lire_releves(chemin: Path, machines: dict[str, dict]) -> tuple[list[Releve], list[ReleveInvalide]]:
     """Lit tout le fichier et renvoie (releves_valides, erreurs) sans s'arrêter sur une ligne invalide."""
-    raise NotImplementedError("à compléter")
+    releves = []
+    erreurs = []
+
+    for numero, brut in lignes_csv(chemin):
+        try:
+            releve = parser_releve(brut, numero, machines)
+            releves.append(releve)
+
+        except ReleveInvalide as err:
+            erreurs.append(err)
+
+    return releves, erreurs
 
 
 def ecrire_rejets(erreurs: list[ReleveInvalide], chemin: Path) -> None:
     """Écrit les lignes rejetées dans un CSV ligne;champ;message, lisible par Excel."""
-    raise NotImplementedError("à compléter")
+    with open(chemin, "w", encoding="utf-8-sig", newline="") as fichier:
+        writer = csv.writer(fichier, delimiter=";")
+
+        writer.writerow(["ligne", "champ", "message"])
+
+        for err in erreurs:
+            writer.writerow([err.ligne, err.champ, err.message])
 
 
 # --- Étape 5 : analyser (dictionnaires, compréhensions) ------------------------------------------
