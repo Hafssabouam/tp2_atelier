@@ -207,12 +207,15 @@ def machines_silencieuses(releves: list[Releve], machines: dict[str, dict]) -> s
 # --- Étape 6 : trier ---------------------------------------------------------------------------
 def classement(releves: list[Releve], machines: dict[str, dict]) -> list[tuple[str, int]]:
     """[(machine, nombre d'alertes)] pour TOUTES les machines, la plus alertée d'abord, puis par identifiant."""
-    raise NotImplementedError("à compléter")
+    compteurs  = {m: 0 for m in machines}
+    for machine, h, motif in alertes(releves, machines):
+        compteurs[machine] += 1
+    return sorted(compteurs.items(), key=lambda x: (-x[1], x[0]))
 
 
 def top_vibrations(releves: list[Releve], n: int = 3) -> list[Releve]:
     """Les n relevés de plus forte vibration, du plus fort au plus faible."""
-    raise NotImplementedError("à compléter")
+    return sorted(releves, key=lambda r: r[3], reverse=True)[:n]
 
 
 # --- Étape 7 : le rapport JSON ------------------------------------------------------------------
