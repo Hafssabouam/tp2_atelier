@@ -221,12 +221,49 @@ def top_vibrations(releves: list[Releve], n: int = 3) -> list[Releve]:
 # --- Étape 7 : le rapport JSON ------------------------------------------------------------------
 def construire_rapport(releves: list[Releve], erreurs: list[ReleveInvalide], machines: dict[str, dict]) -> dict:
     """Le rapport sous forme d'un dictionnaire prêt pour json.dump (pas de datetime, pas d'ensemble)."""
-    raise NotImplementedError("à compléter")
+    resultat_moyennes = {}
+    for machine, valeurs in moyennes(releves).items():
+        temperature, vibration = valeurs
 
+        resultat_moyennes[machine] = {
+            "temperature": temperature,
+            "vibration": vibration
+        }
+        resultat_alertes = []
+
+    for machine, heure, motif in alertes(releves, machines):
+        resultat_alertes.append({
+            "machine": machine,
+            "heure": heure.strftime("%H:%M"),
+            "motif": motif
+        })
+    classement_machines = [
+        machine
+        for machine, nombre in classement(releves, machines)
+        if nombre > 0
+    ]
+    silencieuses = sorted(
+        machines_silencieuses(releves, machines)
+    )
+    rapport = {
+    "releves_valides": len(releves),
+    "lignes_rejetees": len(erreurs),
+    "moyennes": resultat_moyennes,
+    "alertes": resultat_alertes,
+    "classement": classement_machines,
+    "machines_silencieuses": silencieuses
+    }
+    return rapport
 
 def ecrire_rapport(rapport: dict, chemin: Path) -> None:
     """Écrit le rapport en JSON indenté, accents conservés."""
-    raise NotImplementedError("à compléter")
+    with open(chemin, "w", encoding="utf-8") as fichier:
+        json.dump(
+            rapport,
+            fichier,
+            ensure_ascii=False,
+            indent=2
+        )
 
 
 # --- Étape 8 (à la maison) : le journal des événements (expressions régulières) ------------------
