@@ -157,22 +157,51 @@ def ecrire_rejets(erreurs: list[ReleveInvalide], chemin: Path) -> None:
 # --- Étape 5 : analyser (dictionnaires, compréhensions) ------------------------------------------
 def par_machine(releves: list[Releve]) -> dict[str, list[Releve]]:
     """Regroupe les relevés par machine : {machine: [relevés dans l'ordre du fichier]}."""
-    raise NotImplementedError("à compléter")
+    groupes = {}
+
+    for releve in releves:
+        machine = releve[0]
+        groupes.setdefault(machine, []).append(releve)
+
+    return groupes
 
 
 def moyennes(releves: list[Releve]) -> dict[str, tuple[float, float]]:
     """{machine: (température moyenne arrondie à 0,1 ; vibration moyenne arrondie à 0,01)}."""
-    raise NotImplementedError("à compléter")
+    return {
+        machine: (
+            round(sum(r[2] for r in liste) / len(liste), 1),
+            round(sum(r[3] for r in liste) / len(liste), 2)
+        )
+        for machine, liste in par_machine(releves).items()
+    }
 
 
 def alertes(releves: list[Releve], machines: dict[str, dict]) -> list[tuple[str, datetime, str]]:
     """Liste des dépassements de seuil (machine, horodatage, motif), triée par horodatage puis machine."""
-    raise NotImplementedError("à compléter")
+    alertes_temp = [
+        (r[0], r[1], f"température {r[2]} > {machines[r[0]]['temp_max']}")
+        for r in releves
+        if r[2] > machines[r[0]]["temp_max"]
+    ]
+
+    alertes_vib = [
+        (r[0], r[1], f"vibration {r[3]} > {machines[r[0]]['vib_max']}")
+        for r in releves
+        if r[3] > machines[r[0]]["vib_max"]
+    ]
+
+    resultat = alertes_temp + alertes_vib
+    resultat.sort(key=lambda a: (a[1], a[0]))
+
+    return resultat
+
+
 
 
 def machines_silencieuses(releves: list[Releve], machines: dict[str, dict]) -> set[str]:
     """Les machines du référentiel qui n'ont envoyé aucun relevé valide (capteur en panne ?)."""
-    raise NotImplementedError("à compléter")
+    return set(machines) - {r[0] for r in releves}
 
 
 # --- Étape 6 : trier ---------------------------------------------------------------------------
