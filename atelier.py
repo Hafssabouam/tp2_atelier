@@ -267,7 +267,13 @@ def ecrire_rapport(rapport: dict, chemin: Path) -> None:
 
 
 # --- Étape 8 (à la maison) : le journal des événements (expressions régulières) ------------------
-MOTIF_EVENEMENT = re.compile(r"à compléter")   # étape 8
+MOTIF_EVENEMENT = re.compile( 
+    r"(?P<date>\d{4}-\d{2}-\d{2}) "
+    r"(?P<heure>\d{2}:\d{2}:\d{2}) "
+    r"\[(?P<machine>M-\d{2})\] "
+    r"(?P<type>[A-Z]+) "
+    r"code=(?P<code>[A-Z]\d{2})"
+    r"(?: duree=(?P<duree>\d+))?")   # étape 8
 
 
 def lire_evenements(chemin: Path):
@@ -275,9 +281,29 @@ def lire_evenements(chemin: Path):
 
     Clés : machine, type, code, heure, duree (entier en minutes, ou None si absente).
     """
-    raise NotImplementedError("à compléter")
+    with open(chemin, encoding="utf-8") as fichier:
+        for ligne in fichier:
+            match = MOTIF_EVENEMENT.fullmatch(ligne.strip())
+
+            if match is None:
+                continue
+
+            donnees = match.groupdict()
+
+            yield {
+                "machine": donnees["machine"],
+                "type": donnees["type"],
+                "code": donnees["code"],
+                "heure": donnees["heure"],
+                "duree": int(donnees["duree"]) if donnees["duree"] is not None else None
+            }
 
 
 def temps_arret(evenements) -> dict[str, int]:
     """Durée totale des ARRET par machine, en minutes."""
-    raise NotImplementedError("à compléter")
+    resultat = {}
+    for evenement in evenements:
+        if evenement["type"]=="ARRET"and evenement["duree"] is not None:
+            machine = evenement["machine"]
+            resultat[machine] = resultat.get(machine, 0) + evenement["duree"]
+    return resultat
